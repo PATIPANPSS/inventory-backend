@@ -9,10 +9,12 @@ app.use(cors());
 app.use(express.json());
 
 const productRoutes = require('./routes/productRoutes');
-const authRoutes = require('./routes/authRoutes')
+const authRoutes = require('./routes/authRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/order', orderRoutes);
 
 app.get("/", (req, res) => {
   res.json({
