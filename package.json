@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "docker:run": "docker run --rm -d --name inventory-api --env-file .env -p 3000:3000 -e DB_HOST=host.docker.internal inventory-backend"
   },
   "keywords": [],
   "author": "",
