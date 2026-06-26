@@ -64,6 +64,29 @@ const createOrder = async (req, res) => {
   }
 };
 
+const orderHistory =async(req,res) => {
+    try{
+        const sql = `
+            SELECT 
+                orders.id AS order_id, 
+                products.name AS product_name, 
+                orders.quantity, 
+                products.price 
+            FROM orders 
+            JOIN products ON orders.product_id = products.id
+            ORDER BY orders.id DESC
+        `;
+
+        const [result] = await db.query(sql)
+
+        res.status(200).json(result);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({ message: 'Server Error'});
+    }
+}
+
 module.exports = {
   createOrder,
+  orderHistory
 };
