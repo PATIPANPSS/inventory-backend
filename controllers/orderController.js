@@ -1,6 +1,26 @@
 const db = require("../config/db");
+const Joi = require("joi");
 
 const createOrder = async (req, res) => {
+  const orderSchema = Joi.object({
+    user_id: Joi.number().required(),
+    items: Joi.array()
+      .items(
+        Joi.object({
+          product_id: Joi.number().required(),
+          quantity: Joi.number().min(1).required(),
+        }),
+      )
+      .min(1)
+      .required(),
+  });
+
+  const { error } = orderSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
   const connection = await db.getConnection();
 
   try {
@@ -9,14 +29,18 @@ const createOrder = async (req, res) => {
     await connection.beginTransaction();
 
     for (const item of items) {
-      const {product_id, quantity} = item;
+      const { product_id, quantity } = item;
 
       const sqlUpdate =
         "UPDATE products SET quantity = quantity - ? WHERE id = ? AND quantity >= ?";
-       const [updateResult] = await connection.query(sqlUpdate, [quantity, product_id, quantity]);
+      const [updateResult] = await connection.query(sqlUpdate, [
+        quantity,
+        product_id,
+        quantity,
+      ]);
 
       if (updateResult.affectedRows === 0) {
-        throw new Error("สินค้าหมด หรือสต็อกไม่พอ");
+        throw new Error(`สินค้า ID ${product_id} หมด หรือสต็อกไม่พอ`);
       }
 
       const sqlInsert =
